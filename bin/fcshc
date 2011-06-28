@@ -27,6 +27,10 @@ OptionParser.new do |parser|
   parser.on("-o", "--output FILENAME", "Write SWF to FILENAME") do |value|
     $output_filename = File.expand_path(value)
   end
+
+  parser.on("-X EXTRA-ARGUMENT", "Pass EXTRA-ARGUMENT to mxmlc") do |value|
+    $extra_arguments << value
+  end
 end.parse!
 
 for name in ARGV
