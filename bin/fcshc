@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+require "socket"
+
+def die(message)
+  puts "#{File.basename($0)}: #{message}"
+  exit 1
+end
+
+$source_directories = []
+$library_filenames = []
+$extra_arguments = []
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: fcshc MAIN [SRCDIR|LIB]... -o OUTPUT"
+
+  parser.on("--halo", "Use the Halo theme") do
+    if ENV["FLEX_HOME"]
+      $extra_arguments << "-theme=" +
+        File.join(ENV["FLEX_HOME"], *%w(frameworks themes Halo halo.swc))
+    else
+      die "must set $FLEX_HOME to use --halo option"
+    end
+  end
+
+  parser.on("-o", "--output FILENAME", "Write SWF to FILENAME") do |value|
+    $output_filename = value
+  end
+end.parse!
+
+for name in ARGV
+  if not File.exists? name
+    die "no such file or directory: #{name}"
+  elsif File.directory? name
+    $source_directories << File.expand_path(name)
+  elsif %w(.as .mxml).include? File.extname(name)
+    die "multiple source files not allowed" if $source_filename
+    $source_filename = File.expand_path(name)
+  elsif %w(.swc).include? File.extname(name)
+    $library_filenames << File.expand_path(name)
+  else
+    die "don't know what to do with file: #{name}"
+  end
+end
+
+if $source_filename == nil
+  die "missing source file to compile"
+end
+
+if $output_filename == nil
+  $source_filename.sub(/\.(as|mxml)$/, ".swf").tap do |filename|
+    local_filename = File.basename(filename)
+    $output_filename = File.expand_path(local_filename)
+  end
+end
+
+$fcshd_arguments = ["mxmlc #$source_filename -output=#$output_filename"]
+
+for directory in $source_directories
+  $fcshd_arguments << "-compiler.source-path+=#{directory}"
+end
+
+for filename in $library_filenames
+  $fcshd_arguments << "-compiler.library-path+=#{filename}"
+end
+
+$fcshd_arguments.concat($extra_arguments)
+
+socket = TCPSocket.new("localhost", 34345)
+socket.puts $fcshd_arguments.join(" ")
+print socket.read
