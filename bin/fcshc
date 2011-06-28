@@ -25,7 +25,7 @@ OptionParser.new do |parser|
   end
 
   parser.on("-o", "--output FILENAME", "Write SWF to FILENAME") do |value|
-    $output_filename = value
+    $output_filename = File.expand_path(value)
   end
 end.parse!
 
