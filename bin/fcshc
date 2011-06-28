@@ -83,6 +83,7 @@ def format_output(output)
     case line
       when /^(Recompile|Reason): / then nil
       when /^fcsh: Assigned (\d+) as the compile target id/ then nil
+      when /^Loading configuration file / then nil
       else line
     end
   end.compact.join
