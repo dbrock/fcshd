@@ -67,6 +67,25 @@ end
 
 $fcshd_arguments.concat($extra_arguments)
 
-socket = TCPSocket.new("localhost", 34345)
-socket.puts $fcshd_arguments.join(" ")
-print socket.read
+begin
+  host, port = "localhost", 34345
+  socket = TCPSocket.new(host, port)
+rescue Errno::ECONNREFUSED
+  die "Could not connect to fcshd at #{host}:#{port}."
+end
+
+fcshd_command = $fcshd_arguments.join(" ")
+warn fcshd_command
+socket.puts fcshd_command
+
+def format_output(output)
+  output.lines.map do |line|
+    case line
+      when /^(Recompile|Reason): / then nil
+      when /^fcsh: Assigned (\d+) as the compile target id/ then nil
+      else line
+    end
+  end.compact.join
+end
+
+print format_output(socket.read)

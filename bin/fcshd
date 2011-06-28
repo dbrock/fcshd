@@ -18,4 +18,6 @@ logger = FCSHD::StandardLogger.new
 compiler = FCSHD::Compiler.new(fcsh_executable, logger)
 compiler.start! 
 
+Thread.abort_on_exception = true
+
 FCSHD::Server.new(34345, compiler, logger).run!

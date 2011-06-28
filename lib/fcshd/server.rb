@@ -3,7 +3,6 @@ require "socket"
 module FCSHD
   class Server
     def initialize(port, compiler, logger)
-      Thread.abort_on_exception = true
       @server = TCPServer.new("localhost", port)
       @compiler = compiler
       @logger = logger
@@ -11,9 +10,7 @@ module FCSHD
 
     def run!
       loop do
-        socket = @server.accept
-        @logger.log "Accepted connection."
-        Thread.start(socket) do |socket|
+        Thread.start(@server.accept) do |socket|
           Client.new(socket, @compiler).run!
         end
       end
@@ -27,8 +24,10 @@ module FCSHD
         when /^restart$/
           output compiler.restart!
         else
-          error "unrecognized command: #{command}"
+          error "Unrecognized command: #{command}"
         end
+      rescue Errno::EPIPE
+        logger.log "Broken pipe."
       end
 
       def output(content)
@@ -37,7 +36,7 @@ module FCSHD
       end
 
       def error(message)
-        socket.puts "fcshd: error: #{message}"
+        socket.puts "fcshd: #{message}"
         socket.close
       end
     end
