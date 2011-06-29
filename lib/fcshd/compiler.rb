@@ -40,7 +40,7 @@ module FCSHD
       send_command! command
       read_until_prompt.tap do |output|
         case output
-        when /^fcsh: Assigned (\d+) as the compile target id/
+        when /^fcsh: Assigned (\d+) as the compile target id$/
           @command_ids[command] = $1
         else
           @logger.error "Could not determine compile target ID:"

@@ -28,8 +28,16 @@ OptionParser.new do |parser|
     $output_filename = File.expand_path(value)
   end
 
+  parser.on("-3", "Use -compatibility-version=3") do |value|
+    $extra_arguments << "-compatibility-version=3"
+  end
+
   parser.on("-X EXTRA-ARGUMENT", "Pass EXTRA-ARGUMENT to mxmlc") do |value|
     $extra_arguments << value
+  end
+
+  parser.on("-v", "--verbose", "Print mxmlc command line") do
+    $verbose = true
   end
 end.parse!
 
@@ -79,18 +87,56 @@ rescue Errno::ECONNREFUSED
 end
 
 fcshd_command = $fcshd_arguments.join(" ")
-warn fcshd_command
+
+def filename_base
+  File.join(File.expand_path("."), "")
+end
+
+def relativize_filenames(text)
+  text.gsub(filename_base, "")
+end
+
+warn relativize_filenames(fcshd_command) if $verbose
 socket.puts fcshd_command
+
+def format_error(error)
+  case error
+  when "Unable to resolve MXML language version. \
+Please specify the language namespace on the root document tag."
+    ['Missing MXML version.',
+     ' xmlns="http://www.adobe.com/2006/mxml"',
+     ' xmlns:fx="library://ns.adobe.com/mxml/2009"']
+  when /^Could not resolve <(.+)> to a component implementation.$/
+    "`#$1' is undefined."
+  else error
+  end
+end
 
 def format_output(output)
   output.lines.map do |line|
     case line
-      when /^(Recompile|Reason): / then nil
-      when /^fcsh: Assigned (\d+) as the compile target id/ then nil
-      when /^Loading configuration file / then nil
-      else line
+    when /^(Recompile|Reason): / then nil
+    when /^fcsh: Assigned (\d+) as the compile target id/ then nil
+    when /^Loading configuration file / then nil
+    when "Nothing has changed since the last compile. Skip...\n"
+      "fcshc: Nothing to do.\n"
+    when /^(.+\.swf) \((\d+) bytes\)$/ then nil
+    when /^Files changed: \d+ Files affected: \d+$/ then nil
+    when /^(\/.+?)(?:\((\d+)\))?:(?: Error:)? (.+)$/
+      $compilation_failed = true
+      filename = relativize_filenames($1)
+      line_number = $2 || 0
+      message = $3
+      format_error(message).map do |message|
+        "#{filename}:#{line_number}: error: #{message}\n"
+      end
+    when /^Required RSLs:$/ then nil
+    when /^\s+/ then nil
+    else line
     end
-  end.compact.join
+  end.compact.flatten.join
 end
 
 print format_output(socket.read)
+
+exit 1 if $compilation_failed
