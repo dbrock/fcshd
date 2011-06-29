@@ -1,23 +1,15 @@
 #!/usr/bin/env ruby
 
-require "pathname"
-
-cd = File.dirname(Pathname.new(__FILE__).realpath)
-$: << File.expand_path(File.join(cd, "..", "lib"))
-
-fcsh_executable = ENV["FCSH"] or
-  if flex_home = ENV["FLEX_HOME"]
-    File.join(flex_home, "bin", "fcsh")
-  else
-    "fcsh"
-  end
-
 require "fcshd"
 
-logger = FCSHD::StandardLogger.new
-compiler = FCSHD::Compiler.new(fcsh_executable, logger)
+logger = FCSHD::Logger.new(STDERR)
+compiler = FCSHD::Compiler.new(logger)
 compiler.start! 
 
 Thread.abort_on_exception = true
 
-FCSHD::Server.new(34345, compiler, logger).run!
+begin
+  FCSHD::Server.new(34345, compiler, logger).run!
+rescue Interrupt
+  logger.log "Exiting."
+end

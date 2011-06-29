@@ -21,8 +21,6 @@ module FCSHD
         case command = socket.gets
         when /^mxmlc /
           output compiler.compile!(command)
-        when /^restart$/
-          output compiler.restart!
         else
           error "Unrecognized command: #{command}"
         end

@@ -1,8 +1,16 @@
 module FCSHD
-  class StandardLogger
+  class Logger
+    def initialize(output)
+      @stderr = output
+    end
+
+    def log_raw(message)
+      @stderr.puts message
+    end
+
     def log(message)
       for line in message.lines
-        warn "#{program_name}: #{line.chomp}"
+        log_raw "#{program_name}: #{line.chomp}"
       end
     end
 
