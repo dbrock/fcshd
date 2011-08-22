@@ -17,5 +17,9 @@ module FCSHD
         filename
       end
     end
+
+    def with_basedir(new_basedir)
+      SourceLocation.new(filename, line_number, column_number, new_basedir)
+    end
   end
 end

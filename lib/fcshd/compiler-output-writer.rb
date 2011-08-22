@@ -18,14 +18,17 @@ module FCSHD
       end
     end
 
+    def finish_writing!
+    end
+
     def write_uninterpreted_line! line
-      @output.puts "mxmlc: #{chunk}"
+      @output.puts "mxmlc: #{line}"
     end
 
     def write_problem! problem
       location = problem.source_location.with_basedir(@basedir)
       for line in problem.message_lines do
-        @output.puts "#{location}: #{message}"
+        @output.puts "#{location}: #{line}"
       end
     end
 

@@ -103,4 +103,4 @@ socket.puts fcshd_command
 output = FCSHD::CompilerOutput[socket.read, basedir]
 output.write! FCSHD::CompilerOutputWriter.new(STDOUT, basedir)
 
-exit 1 if output.compilation_failed?
+exit 1 if not output.succeeded?
