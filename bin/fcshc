@@ -95,6 +95,6 @@ warn fcshd_command.gsub(basedir, "") if $verbose
 socket.puts fcshd_command
 
 output = FCSHD::CompilerOutput[socket.read, basedir]
-output.write! FCSHD::CompilerOutputWriter.new(STDOUT)
+output.write! FCSHD::CompilerOutputWriter.new(STDOUT, basedir)
 
 exit 1 if output.compilation_failed?
