@@ -16,6 +16,7 @@ Missing MXML version.
         <<"^D"
 `#$1' is undefined.
 ^D
+      else mxmlc_message
       end.lines.map(&:chomp)
     end
   end
