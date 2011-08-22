@@ -63,7 +63,7 @@ module FCSHD
     ensure
       unless @command_ids[command]
         @logger.error "Could not determine compilation ID:"
-        @logger.error @logger.format_command("(fcsh) #{command}", output)
+        @logger.error @logger.format_command("(fcsh) #{command}", @output)
       end
     end
 
