@@ -29,6 +29,10 @@ module FCSHD
       end
     end
 
+    def nothing_to_do?
+      n_compiled_files == 0
+    end
+
     class Parser < Struct.new(:lines, :basedir, :result)
       def parse!
         parse_line! until lines.empty?
