@@ -25,10 +25,12 @@ module FCSHD
     end
 
     def compile! command
-      if @command_ids.include? command
-        recompile! @command_ids[command]
+      @command = command
+
+      if have_command_id?
+        recompile!
       else
-        compile_new! command
+        compile_new!
       end
 
       @output_lines
@@ -57,26 +59,38 @@ module FCSHD
       end
     end
 
-    def compile_new! command
-      send_fcsh_command! command
+    def compile_new!
+      send_fcsh_command! @command
       parse_compilation_output!
     ensure
-      unless @command_ids[command]
+      if not have_command_id?
         @logger.error "Could not determine compilation ID:"
-        @logger.error @logger.format_command("(fcsh) #{command}", @output)
+        @logger.error @logger.format_command("(fcsh) #@command", @output)
       end
     end
 
-    def recompile! id
-      send_fcsh_command! "compile #{id}"
+    def recompile!
+      send_fcsh_command! "compile #{command_id}"
       parse_compilation_output!
+    end
+
+    def command_id
+      @command_ids[@command]
+    end
+
+    def command_id= id
+      @command_ids[@command] = id
+    end
+
+    def have_command_id?
+      @command_ids.include? @command
     end
 
     def parse_compilation_output!
       for line in @output.lines
         case line
         when /^fcsh: Assigned (\d+) as the compile target id$/
-          @command_ids[command] = $1
+          self.command_id = $1
         when /^fcsh: /
           @logger.log_raw(line)
           @output_lines << line
