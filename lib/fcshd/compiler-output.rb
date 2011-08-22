@@ -1,4 +1,4 @@
-module FCSHC
+module FCSHD
   class CompilerOutput
     def self.[] text, basedir
       new.tap do |result|

@@ -1,4 +1,4 @@
-module FCSHC
+module FCSHD
   class CompilerOutputWriter
     def initialize(output, basedir)
       @output = output
