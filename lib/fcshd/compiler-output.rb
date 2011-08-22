@@ -18,7 +18,7 @@ module FCSHD
 
     def write! writer
       writer.write! self do
-        for event in events
+        for event in @events
           case event
           when String
             writer.write_uninterpreted_line! event
@@ -64,7 +64,7 @@ module FCSHD
       end
 
       def skip_line!
-        lines.unshift
+        lines.shift
       end
 
       def line
