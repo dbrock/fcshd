@@ -14,8 +14,11 @@ compiler.start!
 
 Thread.abort_on_exception = true
 
+FCSHD_PORT = 34345
+
 begin
-  FCSHD::Server.new(34345, compiler, logger).run!
+  logger.log "Listening to port #{FCSHD_PORT}."
+  FCSHD::Server.new(FCSHD_PORT, compiler, logger).run!
 rescue Interrupt
   logger.log "Exiting."
 end
