@@ -7,18 +7,7 @@ module FCSHD
 
     def write! subject
       @subject = subject
-      start_writing!
       yield
-      finish_writing!
-    end
-
-    def start_writing!
-      if @subject.nothing_to_do?
-        @output.puts "fcshc: Nothing to do."
-      end
-    end
-
-    def finish_writing!
     end
 
     def write_uninterpreted_line! line
