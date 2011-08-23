@@ -101,7 +101,7 @@ module FCSHD
     end
 
     def send_fcsh_command! command
-      @logger.log(command)
+      @logger.log_raw("> #{command}")
       @fcsh_process.puts(command)
       read_fcsh_output!
     end
