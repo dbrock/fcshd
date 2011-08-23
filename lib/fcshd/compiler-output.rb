@@ -74,6 +74,8 @@ module FCSHD
       end
 
       def skip_line!
+        current_line
+      ensure
         lines.shift
       end
 
