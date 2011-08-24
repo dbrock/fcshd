@@ -15,9 +15,7 @@ module FCSHD
     end
 
     def write_problem! problem
-      location = problem.source_location.
-        with_basedir(@basedir).
-        without_column_number
+      location = problem.source_location.with_basedir(@basedir)
       for line in problem.formatted_message_lines do
         @output.puts "#{location}: #{line}"
       end

@@ -19,12 +19,10 @@ module FCSHD
       case mxmlc_message
       when /^Unable to resolve MXML language version/
         <<"^D"
-Missing MXML version.
-  Try  xmlns="http://www.adobe.com/2006/mxml       (for Flex 3)
-   or  xmlns:fx="library://ns.adobe.com/mxml/2009  (for Flex 4)
-
-Other useful namespaces for use in Flex 4 components:
-  xmlns:s="library://ns.adobe.com/flex/spark"
+missing MXML version
+→ xmlns="http://www.adobe.com/2006/mxml
+→ xmlns:fx="library://ns.adobe.com/mxml/2009
+  xmlns="library://ns.adobe.com/flex/spark"
   xmlns:mx="library://ns.adobe.com/flex/mx"
 ^D
       when
@@ -36,7 +34,7 @@ Other useful namespaces for use in Flex 4 components:
 ^D
           Compiler.find_standard_component($1).tap do |package|
             result << <<"^D" if package
-maybe #{quote "import #{package}.*"}?
+→ import #{package}.*
 ^D
           end
         end
