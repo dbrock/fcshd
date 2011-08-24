@@ -1,10 +1,16 @@
 module FCSHD
-  class Problem < Struct.new(:source_location, :message_lines)
-    def self.[] source_location, mxmlc_message
-      new(source_location, parse_message(mxmlc_message))
+  class Problem < Struct.new(:source_location, :raw_mxmlc_message)
+    ERROR_PREFIX = /^Error: /
+
+    def mxmlc_message
+      raw_mxmlc_message.sub(ERROR_PREFIX, "")
     end
 
-    def self.parse_message(mxmlc_message)
+    def error?
+      raw_mxmlc_message =~ ERROR_PREFIX
+    end
+
+    def message
       case mxmlc_message
       when /^Unable to resolve MXML language version/
         <<"^D"
@@ -16,8 +22,19 @@ Missing MXML version.
         <<"^D"
 `#$1' is undefined.
 ^D
-      else mxmlc_message
-      end.lines.map(&:chomp)
+      else
+        mxmlc_message
+      end
+    end
+
+    def formatted_message_lines
+      message.lines.map do |line|
+        if error?
+          "error: #{line.chomp}"
+        else
+          line.chomp
+        end
+      end
     end
   end
 end

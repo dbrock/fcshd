@@ -57,9 +57,9 @@ module FCSHD
             result.n_compiled_files = 0
           when /^Files changed: (\d+) Files affected: (\d+)$/
             result.n_compiled_files = $1.to_i + $2.to_i
-          when /^(\/.+?)(?:\((\d+)\))?:(?: Error:)? (.+)$/
-            location = SourceLocation[$1, $2.to_i, nil, basedir]
-            result << Problem[location, $3]
+          when /^(\/.+?)(?:\((\d+)\))?: (?:col: (\d+) )?(.+)$/
+            location = SourceLocation[$1, $2.to_i, $3.to_i, basedir]
+            result << Problem[location, $4]
             skip_indented_lines!
           when /^Required RSLs:$/
             skip_indented_lines!

@@ -19,7 +19,11 @@ module FCSHD
     end
 
     def with_basedir(new_basedir)
-      SourceLocation.new(filename, line_number, column_number, new_basedir)
+      dup.tap { |result| result.basedir = new_basedir }
+    end
+
+    def without_column_number
+      dup.tap { |result| result.column_number = nil }
     end
   end
 end
