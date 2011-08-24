@@ -1,11 +1,37 @@
+require "find"
+
 module FCSHD
   class Compiler
-    FCSH_EXECUTABLE = ENV["FCSH"] ||
-      if flex_home = ENV["FLEX_HOME"]
-        File.join(flex_home, "bin", "fcsh")
-      else
-        "fcsh"
+    FLEX_HOME = ENV["FLEX_HOME"]
+
+    def self.flex_path(*components)
+      File.join(FLEX_HOME, *components)
+    end
+
+    def self.standard_fcsh_executable
+      FLEX_HOME ? flex_path("bin", "fcsh") : "fcsh"
+    end
+
+    def self.standard_source_directory_root
+      flex_path("frameworks", "projects")
+    end
+
+    def self.barename(filename)
+      File.basename(filename).sub(/\..*/, "")
+    end
+
+    def self.find_standard_component(name)
+      if FLEX_HOME
+        Find.find(standard_source_directory_root) do |filename|
+          if barename(filename) == name
+            break File.dirname(filename).
+              sub(%r{.+/src/}, "").gsub("/", ".")
+          end
+        end
       end
+    end
+
+    FCSH_EXECUTABLE = ENV["FCSH"] ||
 
     def initialize(logger)
       @logger = logger
