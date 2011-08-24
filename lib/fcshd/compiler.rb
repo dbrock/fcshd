@@ -31,7 +31,7 @@ module FCSHD
       end
     end
 
-    FCSH_EXECUTABLE = ENV["FCSH"] ||
+    FCSH_EXECUTABLE = ENV["FCSH"] || standard_fcsh_executable
 
     def initialize(logger)
       @logger = logger
