@@ -17,14 +17,12 @@ module FCSHD
     end
 
     def write! writer
-      writer.write! self do
-        for event in @events
-          case event
-          when String
-            writer.write_uninterpreted_line! event
-          when Problem
-            writer.write_problem! event
-          end
+      for event in @events
+        case event
+        when String
+          writer.write_uninterpreted_line! event
+        when Problem
+          writer.write_problem! event
         end
       end
     end
@@ -63,8 +61,10 @@ module FCSHD
             skip_indented_lines!
           when /^Required RSLs:$/
             skip_indented_lines!
-          else
+          when /^fcshd: /
             result << line
+          else
+            result << "mxmlc: #{line}"
           end
         end
       end

@@ -43,23 +43,21 @@ module FCSHD
       parse_fcsh_boilerplate!
       @logger.log "Started Flex #@flex_version compiler shell."
     rescue PromptNotFound => error
-      @logger.error "Could not find (fcsh) prompt:"
+      @logger.error "Could not find fcsh prompt:"
       @logger.error @logger.format_command(FCSH_EXECUTABLE, error.message)
       @logger.log "Please set $FLEX_HOME or $FCSH." if
         error.message.include? "command not found"
       @logger.exit
     end
 
-    def compile! command
-      @command = command
+    def compile! command, frontend
+      @command, @frontend = command, frontend
 
       if have_command_id?
         recompile!
       else
         compile_new!
       end
-
-      @output_lines
     end
 
   private
@@ -86,6 +84,8 @@ module FCSHD
     end
 
     def compile_new!
+      @frontend.puts "fcshd: Compiling from scratch..."
+      @frontend.flush
       send_fcsh_command! @command
       parse_compilation_output!
     ensure
@@ -117,11 +117,9 @@ module FCSHD
         case line
         when /^fcsh: Assigned (\d+) as the compile target id$/
           self.command_id = $1
-        when /^fcsh: /
-          @logger.log_raw(line)
-          @output_lines << line
         else
-          @output_lines << line
+          @frontend.puts(line)
+          @logger.log_raw(line) if line =~ /^fcsh: /
         end
       end
     end
@@ -140,7 +138,6 @@ module FCSHD
         @output_buffer.include? FCSH_PROMPT
       @output, @output_buffer =
         @output_buffer.split(FCSH_PROMPT, 2)
-      @output_lines = []
     rescue EOFError
       raise PromptNotFound, @output_buffer
     end

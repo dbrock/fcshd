@@ -5,13 +5,8 @@ module FCSHD
       @basedir = basedir
     end
 
-    def write! subject
-      @subject = subject
-      yield
-    end
-
     def write_uninterpreted_line! line
-      @output.puts "mxmlc: #{line}"
+      @output.puts line
     end
 
     def write_problem! problem

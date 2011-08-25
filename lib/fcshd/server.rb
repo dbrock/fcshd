@@ -20,21 +20,13 @@ module FCSHD
       def run!
         case command = socket.gets
         when /^mxmlc /
-          output compiler.compile!(command)
+          compiler.compile! command, socket
         else
-          error "Unrecognized command: #{command}"
+          sockets.puts "fcshd: Unrecognized command: #{command}"
         end
       rescue Errno::EPIPE
         logger.log "Broken pipe."
-      end
-
-      def output(content)
-        socket.print(content)
-        socket.close
-      end
-
-      def error(message)
-        socket.puts "fcshd: #{message}"
+      ensure
         socket.close
       end
     end
