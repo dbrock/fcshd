@@ -1,52 +1,66 @@
 require "find"
 
 module FCSHD
-  class Compiler
-    FLEX_HOME = ENV["FLEX_HOME"]
+  module FlexHome
+    extend self
 
-    def self.flex_path(*components)
-      File.join(FLEX_HOME, *components)
+    DEFAULT_FLEX_HOME = "/Library/Flex"
+
+    def known?
+      !!flex_home
     end
 
-    def self.standard_fcsh_executable
-      FLEX_HOME ? flex_path("bin", "fcsh") : "fcsh"
+    def fcsh
+      flex_path("bin", "fcsh")
     end
 
-    def self.standard_source_directory_root
-      flex_path("frameworks", "projects")
-    end
-
-    def self.barename(filename)
-      File.basename(filename).sub(/\..*/, "")
-    end
-
-    def self.find_standard_component(name)
-      if FLEX_HOME
-        Find.find(standard_source_directory_root) do |filename|
-          if barename(filename) == name
-            break File.dirname(filename).
-              sub(%r{.+/src/}, "").gsub("/", ".")
-          end
+    def find_standard_component(name)
+      Find.find(standard_source_directory_root) do |filename|
+        if barename(filename) == name
+          break File.dirname(filename).
+            sub(%r{.+/src/}, "").gsub("/", ".")
         end
       end
     end
 
-    FCSH_EXECUTABLE = ENV["FCSH"] || standard_fcsh_executable
+  private
 
+    def flex_home
+      ENV["FLEX_HOME"] or
+        if File.directory? DEFAULT_FLEX_HOME
+          DEFAULT_FLEX_HOME
+        else
+          nil
+        end
+    end
+
+    def flex_path(*components)
+      File.join(flex_home, *components)
+    end
+
+    def standard_source_directory_root
+      flex_path("frameworks", "projects")
+    end
+
+    def barename(filename)
+      File.basename(filename).sub(/\..*/, "")
+    end
+  end
+
+  class Compiler
     def initialize(logger)
       @logger = logger
       @output_buffer = ""
     end
 
     def start!
+      ensure_flex_home_known!
       start_fcsh_process!
       parse_fcsh_boilerplate!
       @logger.log "Started Flex #@flex_version compiler shell."
     rescue PromptNotFound => error
       @logger.error "Could not find fcsh prompt:"
-      @logger.error @logger.format_command(FCSH_EXECUTABLE, error.message)
-      @logger.log "Please set $FLEX_HOME or $FCSH." if
-        error.message.include? "command not found"
+      @logger.error @logger.format_command(FlexHome.fcsh, error.message)
       @logger.exit
     end
 
@@ -62,9 +76,18 @@ module FCSHD
 
   private
 
+    def ensure_flex_home_known!
+      if not FlexHome.known?
+        @logger.log <<"^D" 
+Please put the Flex SDK in #{FlexHome::DEFAULT_FLEX_HOME} or set $FLEX_HOME.
+^D
+        @logger.exit
+      end
+    end
+
     def start_fcsh_process!
       stop_fcsh_process!
-      @fcsh_process = IO.popen("#{FCSH_EXECUTABLE} 2>&1", "r+")
+      @fcsh_process = IO.popen("#{FlexHome.fcsh} 2>&1", "r+")
       read_fcsh_output!
     end
 
