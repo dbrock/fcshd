@@ -54,7 +54,7 @@ missing MXML version
         /^Type was not found or was not a compile-time constant: (.+)\.$/
       then
         ["#{quote $1} undeclared"].tap do |result|
-          Compiler.find_standard_component($1).tap do |package|
+          FlexHome.find_component($1).tap do |package|
             result << "→ import #{package}.*" if package
           end
         end
