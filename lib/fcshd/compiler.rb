@@ -1,52 +1,6 @@
 require "find"
 
 module FCSHD
-  module FlexHome
-    extend self
-
-    DEFAULT_FLEX_HOME = "/Library/Flex"
-
-    def known?
-      !!flex_home
-    end
-
-    def fcsh
-      flex_path("bin", "fcsh")
-    end
-
-    def find_standard_component(name)
-      Find.find(standard_source_directory_root) do |filename|
-        if barename(filename) == name
-          break File.dirname(filename).
-            sub(%r{.+/src/}, "").gsub("/", ".")
-        end
-      end
-    end
-
-  private
-
-    def flex_home
-      ENV["FLEX_HOME"] or
-        if File.directory? DEFAULT_FLEX_HOME
-          DEFAULT_FLEX_HOME
-        else
-          nil
-        end
-    end
-
-    def flex_path(*components)
-      File.join(flex_home, *components)
-    end
-
-    def standard_source_directory_root
-      flex_path("frameworks", "projects")
-    end
-
-    def barename(filename)
-      File.basename(filename).sub(/\..*/, "")
-    end
-  end
-
   class Compiler
     def initialize(logger)
       @logger = logger
@@ -54,7 +8,6 @@ module FCSHD
     end
 
     def start!
-      ensure_flex_home_known!
       start_fcsh_process!
       parse_fcsh_boilerplate!
       @logger.log "Started Flex #@flex_version compiler shell."
@@ -75,15 +28,6 @@ module FCSHD
     end
 
   private
-
-    def ensure_flex_home_known!
-      if not FlexHome.known?
-        @logger.log <<"^D" 
-Please put the Flex SDK in #{FlexHome::DEFAULT_FLEX_HOME} or set $FLEX_HOME.
-^D
-        @logger.exit
-      end
-    end
 
     def start_fcsh_process!
       stop_fcsh_process!
@@ -107,7 +51,7 @@ Please put the Flex SDK in #{FlexHome::DEFAULT_FLEX_HOME} or set $FLEX_HOME.
     end
 
     def compile_new!
-      @frontend.puts "fcshd: Compiling from scratch..."
+      @frontend.puts "fcshd: compiling from scratch"
       @frontend.flush
       send_fcsh_command! @command
       parse_compilation_output!
@@ -115,6 +59,9 @@ Please put the Flex SDK in #{FlexHome::DEFAULT_FLEX_HOME} or set $FLEX_HOME.
       if not have_command_id?
         @logger.error "Could not determine compilation ID:"
         @logger.error @logger.format_command("(fcsh) #@command", @output)
+
+        @frontend.puts "fcshd: internal error"
+        @frontend.flush
       end
     end
 

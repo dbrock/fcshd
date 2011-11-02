@@ -2,6 +2,8 @@ require "socket"
 
 module FCSHD
   class Server
+    PORT = 34345
+
     def initialize(port, compiler, logger)
       @server = TCPServer.new("localhost", port)
       @compiler = compiler
@@ -22,7 +24,7 @@ module FCSHD
         when /^mxmlc /
           compiler.compile! command, socket
         else
-          sockets.puts "fcshd: Unrecognized command: #{command}"
+          sockets.puts "fcshd: unrecognized command: #{command}"
         end
       rescue Errno::EPIPE
         logger.log "Broken pipe."

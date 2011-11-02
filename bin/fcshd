@@ -9,16 +9,24 @@ rescue LoadError
 end
 
 logger = FCSHD::Logger.new(STDERR)
+
+logger.die <<"^D" if not FCSHD::FlexHome.known?
+Please put the Flex SDK in #{FlexHome.default} or set $FLEX_HOME.
+^D
+
+logger.log "This is fcshd #{FCSHD::VERSION}."
+logger.log "Flex SDK: #{FCSHD::FlexHome}"
+
 compiler = FCSHD::Compiler.new(logger)
 compiler.start! 
 
 Thread.abort_on_exception = true
 
-FCSHD_PORT = 34345
-
 begin
-  logger.log "Listening to port #{FCSHD_PORT}."
-  FCSHD::Server.new(FCSHD_PORT, compiler, logger).run!
+  FCSHD::Server.new(FCSHD::Server::PORT, compiler, logger).run!
+  logger.log "Now listening to port #{FCSHD_PORT}."
 rescue Interrupt
   logger.log "Exiting."
+rescue Exception => error
+  logger.error "Could not listen to port #{FCSHD_PORT}: #{error}"
 end
