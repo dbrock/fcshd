@@ -21,7 +21,7 @@ $library_filenames = []
 $extra_arguments = []
 
 OptionParser.new do |parser|
-  parser.banner = "Usage: fcshc MAIN [SRCDIR|LIB]... -o OUTPUT"
+  parser.banner = "Usage: fcshc MAIN.[as|mxml] [SRC|LIB]... -o OUTPUT.swf"
 
   parser.on("-o", "--output FILENAME", "Write SWF to FILENAME") do |value|
     $output_filename = File.expand_path(value)
@@ -40,7 +40,11 @@ OptionParser.new do |parser|
     $extra_arguments << "-theme=#{FlexHome.halo_swc}"
   end
 
-  parser.on("-X EXTRA-ARGUMENT", "Pass EXTRA-ARGUMENT to mxmlc (multiple allowed)") do |value|
+  parser.on("--production", "Do not compile with debug information") do
+    $production = true
+  end
+
+  parser.on("-X EXTRA-ARG", "Pass EXTRA-ARG to mxmlc (multiple allowed)") do |value|
     $extra_arguments << value
   end
 
@@ -48,6 +52,8 @@ OptionParser.new do |parser|
     $verbose = true
   end
 end.parse!
+
+$extra_arguments << "-debug" unless $production
 
 for name in ARGV
   if not File.exists? name
