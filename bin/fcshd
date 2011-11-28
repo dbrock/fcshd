@@ -26,6 +26,7 @@ begin
   FCSHD::Server.new(FCSHD::Server::PORT, compiler, logger).run!
   logger.log "Now listening to port #{FCSHD_PORT}."
 rescue Interrupt
+  logger.log ""
   logger.log "Exiting."
 rescue Exception => error
   logger.error "Could not listen to port #{FCSHD_PORT}: #{error}"
