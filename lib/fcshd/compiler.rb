@@ -51,7 +51,7 @@ module FCSHD
     end
 
     def compile_new!
-      @frontend.puts "fcshd: compiling from scratch"
+      @frontend.puts "fcshd: Compiling from scratch"
       @frontend.flush
       send_fcsh_command! @command
       parse_compilation_output!

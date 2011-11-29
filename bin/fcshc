@@ -121,7 +121,6 @@ socket.each_line do |line|
   end
 end
 
-output = FCSHD::CompilerOutput[compiler_output, basedir]
-output.write! FCSHD::CompilerOutputWriter.new(STDOUT, basedir)
-
-exit 1 if not output.succeeded?
+transcript = FCSHD::Transcript[compiler_output]
+puts transcript.to_s(basedir)
+exit 1 if not transcript.succeeded?

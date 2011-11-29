@@ -1,5 +1,7 @@
 version=$(shell ruby -r lib/fcshd/version -e 'print FCSHD::VERSION')
 
+default: install
+
 build:
 	gem build fcshd.gemspec
 install: build
