@@ -13,7 +13,7 @@ module FCSHD
     def parse_line!
       take_line! do |line|
         case FCSHD.trim(line)
-        when /^(.+\.swf) \((\d+) bytes\)$/
+        when / \((\d+) bytes\)$/
           result.succeeded = true
 
         when "Nothing has changed since the last compile. Skip..."
