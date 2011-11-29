@@ -8,6 +8,11 @@ rescue LoadError
   require "fcshd"
 end
 
+if ARGV == ["-v"] || ARGV == ["--version"]
+  puts "fcshd #{FCSHD::VERSION}"
+  exit
+end
+
 logger = FCSHD::Logger.new(STDERR)
 
 logger.die <<"^D" if not FCSHD::FlexHome.known?

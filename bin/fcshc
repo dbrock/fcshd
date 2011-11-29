@@ -48,7 +48,12 @@ OptionParser.new do |parser|
     $extra_arguments << value
   end
 
-  parser.on("-v", "--verbose", "Print mxmlc command line") do
+  parser.on("-v", "--version", "Print `fcshc #{FCSHD::VERSION}' and exit") do
+    puts "fcshc #{FCSHD::VERSION}"
+    exit
+  end
+
+  parser.on("--verbose", "Print mxmlc command line") do
     $verbose = true
   end
 end.parse!
