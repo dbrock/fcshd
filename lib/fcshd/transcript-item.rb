@@ -45,11 +45,15 @@ EOF
       when /^Incorrect number of arguments. Expected (\d+)\.$/: <<EOF
 error: expected #$1 arguments
 EOF
-      when /^(?:Access of possibly undefined property|Call to a possibly undefined method) (.+) through a reference with static type (.+)\.$/: <<EOF
-error: #{quote $1} undeclared in #$2
+      when
+        /^Access of possibly undefined property (.+) through a reference with static type (.+)\.$/,
+        /^Call to a possibly undefined method (.+) through a reference with static type (.+)\.$/,
+        /^Cannot resolve attribute '(.+)' for component type (.+)\.$/
+      then <<EOF
+error: #{quote $1} undeclared in #{name $2}
 EOF
       when /^Attempted access of inaccessible property (.+) through a reference with static type (.+)\.$/: <<EOF
-error: #{quote $1} inaccessible in #$2
+error: #{quote $1} inaccessible in #{name $2}
 EOF
       when
         /^Could not resolve <(.+)> to a component implementation\.$/,
