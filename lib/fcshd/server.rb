@@ -21,10 +21,10 @@ module FCSHD
     class Client < Struct.new(:socket, :compiler)
       def run!
         case command = socket.gets
-        when /^mxmlc /
+        when /^(mxmlc|compc) /
           compiler.compile! command, socket
         else
-          sockets.puts "fcshd: unrecognized command: #{command}"
+          socket.puts "fcshd: unrecognized command: #{command}"
         end
       rescue Errno::EPIPE
         logger.log "Broken pipe."

@@ -16,22 +16,46 @@ def die(message)
   exit 1
 end
 
-$source_directories = []
-$library_filenames = []
+$output_file = nil
+$source_files = []
+$library_files = []
+$directories = []
+$production = false
 $extra_arguments = []
+$verbose = false
 
 OptionParser.new do |parser|
-  parser.banner = "Usage: fcshc MAIN.[as|mxml] [SRC|LIB]... -o OUTPUT.swf"
+  parser.banner = <<EOF
+Usage: fcshc MAIN.[as|mxml] [SRCDIR|SWCDIR|SWC]... [-o OUTPUT.swf]
+       fcshc -o OUTPUT.swc [SRCDIR|SWCDIR|SWC]...
 
-  parser.on("-o", "--output FILENAME", "Write SWF to FILENAME") do |value|
-    $output_filename = File.expand_path(value)
+To compile an SWF, name the main application source file, then any
+additional source directories, SWC directories, or SWC files.
+To compile an SWC using `compc', you must provide the `-o' option, and
+then at least one source directory, SWC directory, or SWC file.
+To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE'.
+
+EOF
+
+  parser.on("-o", "--output OUTPUT.[swf|swc]", "Name of the resulting binary") do |value|
+    $output_file = File.expand_path(value)
   end
 
-  parser.on("-3", "Use -compatibility-version=3") do |value|
+  parser.on("-X", "--extra-argument ARGUMENT", "Pass ARGUMENT to the compiler") do |value|
+    $extra_arguments << value
+  end
+
+  parser.on("-p", "--production", "Leave out debugging metadata") do
+    $production = true
+  end
+
+  parser.separator ""
+
+  parser.on("-3", "--flex-3", "Use -compatibility-version=3") do |value|
     $extra_arguments << "-compatibility-version=3"
   end
 
-  parser.on("--no-flex", "Remove all runtime shared libraries (RSLs)") do
+  parser.on("--no-flex", "Remove runtime shared libraries (RSLs)") do
     $extra_arguments << "-runtime-shared-library-path="
   end
 
@@ -40,22 +64,24 @@ OptionParser.new do |parser|
     $extra_arguments << "-theme=#{FlexHome.halo_swc}"
   end
 
-  parser.on("--production", "Do not compile with debug information") do
-    $production = true
+  parser.separator ""
+
+  parser.on("--verbose", "Echo the compiler command being run") do
+    $verbose = true
   end
 
-  parser.on("-X EXTRA-ARG", "Pass EXTRA-ARG to mxmlc (multiple allowed)") do |value|
-    $extra_arguments << value
+  parser.on("-h", "--help", "Show this message") do
+    puts parser
+    exit
   end
 
-  parser.on("-v", "--version", "Print `fcshc #{FCSHD::VERSION}' and exit") do
+  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}'") do
     puts "fcshc #{FCSHD::VERSION}"
     exit
   end
 
-  parser.on("--verbose", "Print mxmlc command line") do
-    $verbose = true
-  end
+  parser.separator ""
+  parser.separator "See <http://github.com/dbrock/fcshd> for more information."
 end.parse!
 
 $extra_arguments << "-debug" unless $production
@@ -64,41 +90,61 @@ for name in ARGV
   if not File.exists? name
     die "no such file or directory: #{name}"
   elsif File.directory? name
-    $source_directories << File.expand_path(name)
+    $directories << File.expand_path(name)
   elsif %w(.as .mxml).include? File.extname(name)
-    die "multiple source files not allowed" if $source_filename
-    $source_filename = File.expand_path(name)
+    $source_files << File.expand_path(name)
   elsif %w(.swc).include? File.extname(name)
-    $library_filenames << File.expand_path(name)
+    $library_files << File.expand_path(name)
   else
     die "don't know what to do with file: #{name}"
   end
 end
 
-if $source_filename == nil
-  die "missing source file to compile"
-end
+$compiling_swc = $output_file && $output_file.end_with?(".swc")
 
-if $source_directories == []
-  $source_directories << File.dirname($source_filename)
-end
-
-if $output_filename == nil
-  $source_filename.sub(/\.(as|mxml)$/, ".swf").tap do |filename|
-    local_filename = File.basename(filename)
-    $output_filename = File.expand_path(local_filename)
+if $compiling_swc
+  if [$source_files, $directories, $library_files] == [[], [], []]
+    die "must include at least one source file, directory, or SWC"
   end
+
+  $fcshd_arguments = ["compc"]
+
+  for file in $source_files
+    $fcshd_arguments << "-include-sources+=#{file}"
+  end
+
+  for directory in $directories
+    $fcshd_arguments << "-include-sources+=#{directory}"
+  end
+else
+  case $source_files.size
+  when 0: die "missing main application source file"
+  when 1: $source_file = $source_files.first
+  else die "multiple source files not allowed when compiling SWF"
+  end
+
+  if $directories.empty?
+    $directories << File.dirname($source_file)
+  end
+
+  if $output_file == nil
+    $source_file.sub(/\.(as|mxml)$/, ".swf").tap do |x|
+      $output_file = File.expand_path(File.basename(x))
+    end
+  end
+
+  $fcshd_arguments = ["mxmlc", "#$source_file"]
 end
 
-$fcshd_arguments = ["mxmlc #$source_filename -output=#$output_filename"]
+$fcshd_arguments << "-output=#$output_file"
 
-for directory in $source_directories
+for directory in $directories
   $fcshd_arguments << "-compiler.source-path+=#{directory}"
   $fcshd_arguments << "-compiler.library-path+=#{directory}"
 end
 
-for filename in $library_filenames
-  $fcshd_arguments << "-compiler.library-path+=#{filename}"
+for file in $library_files
+  $fcshd_arguments << "-compiler.library-path+=#{file}"
 end
 
 $fcshd_arguments.concat($extra_arguments)
@@ -127,5 +173,5 @@ socket.each_line do |line|
 end
 
 transcript = FCSHD::Transcript[compiler_output]
-puts transcript.to_s(basedir)
+STDOUT.write transcript.to_s(basedir)
 exit 1 if not transcript.succeeded?
