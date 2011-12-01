@@ -32,8 +32,10 @@ Usage: fcshc MAIN.[as|mxml] [SRCDIR|SWCDIR|SWC]... [-o OUTPUT.swf]
 
 To compile an SWF, name the main application source file, then any
 additional source directories, SWC directories, or SWC files.
+
 To compile an SWC using `compc', you must provide the `-o' option, and
 then at least one source directory, SWC directory, or SWC file.
+
 To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE'.
 
 EOF
@@ -90,7 +92,7 @@ EOF
   end
 
   parser.separator ""
-  parser.separator "See <http://github.com/dbrock/fcshd> for more information."
+  parser.separator "TL;DR: $ fcshc src/my_app.mxml"
 end.parse!
 
 $extra_arguments << "-debug" unless $production
