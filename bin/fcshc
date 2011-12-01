@@ -49,14 +49,18 @@ EOF
     $production = true
   end
 
+  parser.on("--static-rsls", "Use static linking for RSLs") do
+    $extra_arguments << "-static-link-runtime-shared-libraries=true"
+  end
+
+  parser.on("--no-rsls", "Remove all runtime shared libraries") do
+    $extra_arguments << "-runtime-shared-library-path="
+  end
+
   parser.separator ""
 
   parser.on("-3", "--flex-3", "Use -compatibility-version=3") do |value|
     $extra_arguments << "-compatibility-version=3"
-  end
-
-  parser.on("--no-flex", "Remove runtime shared libraries (RSLs)") do
-    $extra_arguments << "-runtime-shared-library-path="
   end
 
   parser.on("--halo", "Use the Halo theme") do
@@ -70,13 +74,13 @@ EOF
     $verbose = true
   end
 
-  parser.on("-h", "--help", "Show this message") do
-    puts parser
+  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}'") do
+    puts "fcshc #{FCSHD::VERSION}"
     exit
   end
 
-  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}'") do
-    puts "fcshc #{FCSHD::VERSION}"
+  parser.on("-h", "--help", "Show this message") do
+    puts parser
     exit
   end
 
