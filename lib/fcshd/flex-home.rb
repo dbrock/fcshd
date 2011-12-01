@@ -1,3 +1,5 @@
+require "find"
+
 module FCSHD
   module FlexHome
     extend self

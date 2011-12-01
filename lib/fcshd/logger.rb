@@ -1,21 +1,17 @@
 module FCSHD
   class Logger
     def initialize(output)
-      @stderr = output
-    end
-
-    def log_raw(message)
-      @stderr.puts message
+      @output = output
     end
 
     def log(message)
       for line in message.lines
-        log_raw "#{program_name}: #{line.chomp}"
+        @output.puts "#{File.basename($0)}: #{line.chomp}"
       end
     end
 
-    def program_name
-      File.basename($0)
+    def dump(output)
+      @output.puts output.chomp
     end
 
     def error(message)
@@ -25,17 +21,8 @@ module FCSHD
     end
 
     def die(message)
-      error message ; exit
-    end
-
-    def exit(code=1)
-      Kernel.exit code
-    end
-
-    def format_command(command, output)
-      ["$ #{command}", *output.lines].
-        map { |line| "    #{line.chomp}" }.
-        join("\n")
+      error message
+      exit 1
     end
   end
 end
