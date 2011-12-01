@@ -23,6 +23,7 @@ $directories = []
 $production = false
 $extra_arguments = []
 $verbose = false
+$dry_run = false
 
 OptionParser.new do |parser|
   parser.banner = <<EOF
@@ -70,7 +71,11 @@ EOF
 
   parser.separator ""
 
-  parser.on("--verbose", "Echo the compiler command being run") do
+  parser.on("-n", "--dry-run", "Only print the compiler command") do
+    $dry_run = true
+  end
+
+  parser.on("--verbose", "Also print the compiler command") do
     $verbose = true
   end
 
@@ -153,6 +158,15 @@ end
 
 $fcshd_arguments.concat($extra_arguments)
 
+basedir = File.join(File.expand_path("."), "")
+fcshd_command = $fcshd_arguments.join(" ")
+
+if $verbose || $dry_run
+  warn fcshd_command.gsub(basedir, "")
+end
+
+exit if $dry_run
+
 begin
   host, port = "localhost", FCSHD::Server::PORT
   socket = TCPSocket.new(host, port)
@@ -160,10 +174,6 @@ rescue Errno::ECONNREFUSED
   die "could not connect to fcshd at #{host}:#{port}"
 end
 
-basedir = File.join(File.expand_path("."), "")
-
-fcshd_command = $fcshd_arguments.join(" ")
-warn fcshd_command.gsub(basedir, "") if $verbose
 socket.puts fcshd_command
 
 compiler_output = ""
