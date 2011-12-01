@@ -21,11 +21,11 @@ module FCSHD
       @items.map do |item|
         case item
         when Item
-          item.to_s(basedir)
+          "#{item.to_s(basedir)}\n"
         else
-          item.to_s
+          "#{item}\n"
         end
-      end.join("\n")
+      end.join
     end
 
     def nothing_to_do?
