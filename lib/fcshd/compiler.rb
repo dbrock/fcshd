@@ -24,9 +24,8 @@ module FCSHD
 
     def start_fcsh_process!
       stop_fcsh_process!
-      command = "#{FlexHome.fcsh} 2>&1"
-      @logger.log "starting #{command}"
-      @fcsh_process = IO.popen(command, "r+")
+      @logger.log "starting #{FlexHome.fcsh}"
+      @fcsh_process = IO.popen("#{FlexHome.fcsh} 2>&1", "r+")
       read_until_prompt!
     end
 
@@ -80,7 +79,7 @@ module FCSHD
     end
 
     def send_fcsh_command! command
-      @logger.log "> #{command}"
+      @logger.log(command)
       @fcsh_process.puts(command)
       read_until_prompt!
     end
