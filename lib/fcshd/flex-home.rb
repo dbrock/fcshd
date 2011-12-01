@@ -33,6 +33,10 @@ module FCSHD
       self["bin/fcsh"]
     end
 
+    def libs
+      self["frameworks/libs"]
+    end
+
     def halo_swc
       self["frameworks/themes/Halo/halo.swc"]
     end

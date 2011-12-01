@@ -67,8 +67,11 @@ EOF
   end
 
   parser.on("--halo", "Use the Halo theme") do
-    die "must set $FLEX_HOME to use --halo option" if not FlexHome.known?
-    $extra_arguments << "-theme=#{FlexHome.halo_swc}"
+    if FCSHD::FlexHome.known?
+      $extra_arguments << "-theme=#{FCSHD::FlexHome.halo_swc}"
+    else 
+      die "must set $FLEX_HOME to use --halo option"
+    end
   end
 
   parser.separator ""
@@ -126,6 +129,10 @@ if $compiling_swc
 
   for directory in $directories
     $fcshd_arguments << "-include-sources+=#{directory}"
+  end
+
+  if FCSHD::FlexHome.known?
+    $extra_arguments << "-external-library-path+=#{FCSHD::FlexHome.libs}"
   end
 else
   case $source_files.size
