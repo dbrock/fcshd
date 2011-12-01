@@ -60,10 +60,12 @@ EOF
         /^Call to a possibly undefined method (.+)\.$/,
         /^Access of undefined property (.+)\.$/,
         /^The definition of base class (.+) was not found\.$/,
+        /^Unable to locate specified base class '(.+)' for component class '.*'\.$/,
+        /^Interface (.+) was not found\.$/,
         /^Type was not found or was not a compile-time constant: (.+)\.$/
       then
          [<<EOF].tap do |result|
-error: #{quote $1} undeclared
+error: #{quote $1} undefined
 EOF
           FlexHome.find_component($1).tap do |package|
             result << <<EOF if package
