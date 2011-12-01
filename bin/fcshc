@@ -132,7 +132,9 @@ if $compiling_swc
   end
 
   if FCSHD::FlexHome.known?
-    $extra_arguments << "-external-library-path+=#{FCSHD::FlexHome.libs}"
+    for dir in FCSHD::FlexHome.framework_lib_dirs
+      $extra_arguments << "-external-library-path+=#{dir}"
+    end
   end
 else
   case $source_files.size

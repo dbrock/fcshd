@@ -35,8 +35,12 @@ module FCSHD
       self["bin/fcsh"]
     end
 
-    def libs
-      self["frameworks/libs"]
+    def framework_lib_dirs
+      [].tap do |result|
+        Find.find(self["frameworks/libs"]) do |file|
+          result << file if File.directory? file
+        end
+      end
     end
 
     def halo_swc
