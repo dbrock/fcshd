@@ -33,6 +33,15 @@ module FCSHD
       end
     end
 
+    def format_type(type)
+      case type
+      when /^__AS3__\.vec:Vector\.<(.*)>$/
+        "Vector.<#{$1.sub(/.+:/, "")}>"
+      else
+        type.sub(/.+:/, "")
+      end
+    end
+
     def parsed_message
       case FCSHD.trim(mxmlc_message).sub(/^Error: /, "")
       when "Unable to resolve MXML language version. Please specify the language namespace on the root document tag.": <<EOF
@@ -78,10 +87,9 @@ error: #{quote $1} not found
 EOF
       when /^Implicit coercion of a value of type (.+) to an unrelated type (.+)\.$/, /^Implicit coercion of a value with static type (.+) to a possibly unrelated type (.+)\./
         actual, expected = $1, $2
-        expected_local = expected.sub(/.+:/, "")
-        actual_local = actual.sub(/.+:/, "")
-        actual_local != expected_local ? <<EOF : <<EOF
-error: expected #{expected_local} (got #{actual_local})
+        if format_type(actual) != format_type(expected)
+        then <<EOF else <<EOF end
+error: expected #{format_type(expected)} (got #{format_type(actual)})
 EOF
 error: expected #{expected} (got #{actual})
 EOF
