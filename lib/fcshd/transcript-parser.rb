@@ -31,6 +31,7 @@ module FCSHD
 
         when /^(Recompile|Reason|Updated): /
         when /^Loading configuration file /
+        when "Detected configuration changes. Recompile..."
 
         else
           # Let unrecognized lines pass through verbatim.
