@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 module FCSHD
   class Compiler
     def initialize(logger)
@@ -12,6 +13,8 @@ module FCSHD
 
     def compile! command, frontend
       @command, @frontend = command, frontend
+
+      @logger.log("—" * 60)
 
       if have_command_id?
         recompile!
