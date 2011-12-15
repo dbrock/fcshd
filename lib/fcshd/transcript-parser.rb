@@ -29,7 +29,7 @@ module FCSHD
         when /^Required RSLs:$/
           skip_indented_lines! # Does anybody care about this?
 
-        when /^(Recompile|Reason): /
+        when /^(Recompile|Reason|Updated): /
         when /^Loading configuration file /
 
         else
