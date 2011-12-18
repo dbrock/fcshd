@@ -1,17 +1,22 @@
 require "./lib/fcshd/version"
 
-version = FCSHD::VERSION
+name, version = "fcshd", FCSHD::VERSION
 
-gem = "fcshd-#{version}.gem"
-gemspec = "fcshd.gemspec"
+gem = "#{name}-#{version}.gem"
+gemspec = "#{name}.gemspec"
+sources = FileList["{bin,lib}/**/*"]
 
-task :default => :install
+task :default => [:uninstall, :install]
 
 task :install => gem do
   sh "sudo gem install #{gem}"
 end
 
-file gem do
+task :uninstall do
+  sh "sudo gem uninstall #{name} -v #{version}"
+end
+
+file gem => FileList[gemspec, sources] do
   sh "gem build #{gemspec}"
 end
 
