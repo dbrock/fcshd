@@ -7,9 +7,8 @@ module FCSHD
       @command_ids = {}
     end
 
-    def start!
-      restart_fcsh_process!
-    end
+    def start!; restart_fcsh_process! end
+    def restart!; restart_fcsh_process! end
 
     def compile! command, frontend
       @command, @frontend = command, frontend

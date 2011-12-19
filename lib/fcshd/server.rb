@@ -20,9 +20,12 @@ module FCSHD
 
     class Client < Struct.new(:socket, :compiler)
       def run!
-        case command = socket.gets
+        case command = socket.gets.chomp
         when /^(mxmlc|compc) /
           compiler.compile! command, socket
+        when "restart"
+          compiler.restart!
+          socket.puts "fcshd: compiler restarted"
         else
           socket.puts "fcshd: unrecognized command: #{command}"
         end
