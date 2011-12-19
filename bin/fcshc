@@ -123,19 +123,23 @@ for name in ARGV
   end
 end
 
-ENV["FCSHD_LIBRARY_PATH"] ||= "~/.fcshd-lib"
+ENV["FCSHD_LIBRARY_PATH"] ||= ""
+ENV["FCSHD_LIBRARY_PATH"] += ":~/.fcshd-lib"
 
 def find_library(name)
-  for libdir in ENV["FCSHD_LIBRARY_PATH"].split(":")
-    libdir = File.expand_path(libdir)
-    filename = "#{libdir}/#{name}"
-    if File.directory? filename
-      return :directory, filename
-    elsif File.exists? "#{filename}.swc"
-      return :file, "#{filename}.swc"
+  nil.tap do
+    for x in ENV["FCSHD_LIBRARY_PATH"].split(":")
+      next if x == ""
+      x = File.expand_path(x)
+      if File.basename(x) == "#{name}.swc" and File.file? x
+        return :file, x
+      elsif File.directory? File.join(x, name)
+        return :directory, File.join(x, name)
+      elsif File.file? File.join(x, "#{name}.swc")
+        return :file, File.join(x, "#{name}.swc")
+      end
     end
   end
-  return nil
 end
 
 for library in $libraries
