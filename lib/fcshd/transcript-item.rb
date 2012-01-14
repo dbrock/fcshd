@@ -44,14 +44,14 @@ module FCSHD
 
     def parsed_message
       case FCSHD.trim(mxmlc_message).sub(/^Error: /, "")
-      when "Unable to resolve MXML language version. Please specify the language namespace on the root document tag.": <<EOF
+      when "Unable to resolve MXML language version. Please specify the language namespace on the root document tag." then <<EOF
 error: missing MXML version
 error: hint: xmlns:fx="library://ns.adobe.com/mxml/2009"
 error: hint: xmlns="library://ns.adobe.com/flex/spark"
 error: hint: xmlns:mx="library://ns.adobe.com/flex/mx" (Flex 4)
 error: hint: xmlns="http://www.adobe.com/2006/mxml" (Flex 3)
 EOF
-      when /^Incorrect number of arguments. Expected (\d+)\.$/: <<EOF
+      when /^Incorrect number of arguments. Expected (\d+)\.$/ then <<EOF
 error: expected #$1 arguments
 EOF
       when
@@ -61,7 +61,7 @@ EOF
       then <<EOF
 error: #{quote $1} undeclared in #{name $2}
 EOF
-      when /^Attempted access of inaccessible property (.+) through a reference with static type (.+)\.$/: <<EOF
+      when /^Attempted access of inaccessible property (.+) through a reference with static type (.+)\.$/ then <<EOF
 error: #{quote $1} inaccessible in #{name $2}
 EOF
       when
@@ -82,7 +82,7 @@ error: hint: import #{package}.#$1
 EOF
           end
         end
-      when /^Definition (.+) could not be found\.$/: <<EOF
+      when /^Definition (.+) could not be found\.$/ then <<EOF
 error: #{quote $1} not found
 EOF
       when /^Implicit coercion of a value of type (.+) to an unrelated type (.+)\.$/, /^Implicit coercion of a value with static type (.+) to a possibly unrelated type (.+)\./
@@ -93,16 +93,16 @@ error: expected #{format_type(expected)} (got #{format_type(actual)})
 EOF
 error: expected #{expected} (got #{actual})
 EOF
-      when "Method marked override must override another method.": <<EOF
+      when "Method marked override must override another method." then <<EOF
 error: overriding nonexistent method
 EOF
-      when "Overriding a function that is not marked for override.": <<EOF
+      when "Overriding a function that is not marked for override." then <<EOF
 error: unmarked override
 EOF
-      when "Incompatible override.": <<EOF
+      when "Incompatible override." then <<EOF
 error: incompatible override
 EOF
-      when /^Ambiguous reference to (.+)\.$/: <<EOF
+      when /^Ambiguous reference to (.+)\.$/ then <<EOF
 error: #{quote $1} is ambiguous
 EOF
       when /^Can not resolve a multiname reference unambiguously. (\S+) \(from ([^)]+)\) and (\S+) \(from ([^)]+)\) are available\.$/
@@ -114,7 +114,7 @@ error: conflicting definition
 EOF
 error: conflicting definition
 EOF
-      when /^A conflict exists with definition (.+) in namespace internal\.$/: <<EOF
+      when /^A conflict exists with definition (.+) in namespace internal\.$/ then <<EOF
 error: #{quote $1} conflicts with an internal name
 EOF
       when
@@ -125,25 +125,25 @@ EOF
         <<EOF
 error: #{who} missing type declaration
 EOF
-      when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/: <<EOF
+      when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/ then <<EOF
 error: package should be #{quote $1}
 EOF
-      when /^Comparison between a value with static type (.+) and a possibly unrelated type (.+)\.$/: <<EOF
+      when /^Comparison between a value with static type (.+) and a possibly unrelated type (.+)\.$/ then <<EOF
 error: comparing #$1 to #$2
 EOF
-      when "Illegal assignment to a variable specified as constant.": <<EOF
+      when "Illegal assignment to a variable specified as constant." then <<EOF
 error: modifying constant
 EOF
-      when "Function does not have a body.": <<EOF
+      when "Function does not have a body." then <<EOF
 error: missing function body"
 EOF
-      when "Return type of a setter definition must be unspecified or void.": <<EOF
+      when "Return type of a setter definition must be unspecified or void." then <<EOF
 error: setter must return void"
 EOF
-      when "Function does not return a value.": <<EOF
+      when "Function does not return a value." then <<EOF
 error: missing return statement"
 EOF
-      when "Syntax error: expecting identifier before rightparen.": <<EOF
+      when "Syntax error: expecting identifier before rightparen." then <<EOF
 error: #{quote ")"} unexpected"
 EOF
       when

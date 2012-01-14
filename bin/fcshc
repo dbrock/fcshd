@@ -199,8 +199,10 @@ if $run_compilation
     case $source_files.size
     when 0
       die "missing main application source file"
-    when 1: $source_file = $source_files.first
-    else die "multiple source files not allowed when compiling SWF"
+    when 1
+      $source_file = $source_files.first
+    else
+      die "multiple source files not allowed when compiling SWF"
     end
   
     if $directories.empty?
