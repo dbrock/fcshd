@@ -1,0 +1,69 @@
+#!/usr/bin/env ruby
+
+require "readline"
+require "tempfile"
+require "fileutils"
+
+include FileUtils
+
+def mkdir_cd dir
+  mkdir_p dir
+  Dir.chdir dir
+end
+
+mkdir_cd "/tmp/fcshc-repl"
+
+catch :ok do
+  for i in 0..10
+    if not File.exist? i.to_s
+      mkdir_cd i.to_s
+      tmpdir = Dir.pwd
+      at_exit do
+        Dir.chdir tmpdir do
+          rm_f "dummy.as"
+          rm_f "dummy.swf"
+        end
+        rmdir tmpdir
+      end
+      throw :ok
+    end
+  end
+  fail "too many entries in #{Dir.pwd}"
+end
+
+program_template = DATA.read
+get_program = -> code do
+  program_template.sub("__CODE__", code)
+end
+
+class MyInterrupt < StandardError; end
+
+while line = Readline.readline("as3> ", true)
+  File.open("dummy.as", "w") { |file| file << get_program[line] }
+  output = `fcshc -lstdio -lknock --no-rsls dummy.as`
+  puts output.gsub(/^dummy.as:\d+: /, "") unless output == ""
+  if $? == 0
+    system "run-swf dummy.swf"
+  end
+end
+
+__END__
+package {
+  import stdio.flash.Sprite
+  import stdio.process
+  import knock.inspect
+  import flash.utils.*
+
+  public class dummy extends Sprite {
+    override public function main(): void {
+      process.immortal = false
+      process.whiny = true
+
+      try {
+        process.warn(inspect(__CODE__))
+      } finally {
+        process.exit()
+      }
+    }
+  }
+}

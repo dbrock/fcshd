@@ -15,5 +15,5 @@ client program `fcshc' as a faster and more usable replacement for `mxmlc'.
   gem.date = Time.now.utc.strftime("%Y-%m-%d")
   gem.homepage = "http://github.com/dbrock/fcshd"
   gem.files = `git ls-files`.lines.map(&:chomp)
-  gem.executables = %w"fcshd fcshc"
+  gem.executables = %w"fcshd fcshc fcshc-repl"
 end
