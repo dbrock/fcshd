@@ -22,6 +22,7 @@ end
 
 task :push => gem do
   sh "gem push #{gem}"
+  sh "sudo gem install #{name}"
 end
 
 require "rake/clean"
