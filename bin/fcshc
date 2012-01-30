@@ -164,7 +164,7 @@ for library in $libraries
   type, filename = find_library(library)
   case type
   when :directory
-    $directories << name
+    $directories << filename
   when :file
     $library_files << filename
   else
