@@ -31,27 +31,11 @@ catch :ok do
   fail "too many entries in #{Dir.pwd}"
 end
 
-program_template = DATA.read
-get_program = -> code do
-  program_template.sub("__CODE__", code)
-end
-
-class MyInterrupt < StandardError; end
-
-while line = Readline.readline("as3> ", true)
-  File.open("dummy.as", "w") { |file| file << get_program[line] }
-  output = `fcshc -lstdio -lknock --no-rsls dummy.as`
-  puts output.gsub(/^dummy.as:\d+: /, "") unless output == ""
-  if $? == 0
-    system "run-swf dummy.swf"
-  end
-end
-
-__END__
+program_template = <<EOF
 package {
   import stdio.flash.Sprite
   import stdio.process
-  import knock.inspect
+  import stdlib.inspect
   import flash.utils.*
 
   public class dummy extends Sprite {
@@ -67,3 +51,19 @@ package {
     }
   }
 }
+EOF
+
+get_program = lambda do |code|
+  program_template.sub("__CODE__", code)
+end
+
+class MyInterrupt < StandardError; end
+
+while line = Readline.readline("as3> ", true)
+  File.open("dummy.as", "w") { |file| file << get_program[line] }
+  output = `fcshc -lstdlib -lstdio -lknock --no-rsls dummy.as`
+  puts output.gsub(/^dummy.as:\d+: /, "") unless output == ""
+  if $? == 0
+    system "run-stdio-swf dummy.swf"
+  end
+end
