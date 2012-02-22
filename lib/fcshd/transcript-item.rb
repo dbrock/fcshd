@@ -118,12 +118,16 @@ EOF
 error: #{quote $1} conflicts with an internal name
 EOF
       when
-        /^Warning: parameter '(.+)' has no type declaration\.$/,
         /^Warning: return value for function '(.+)' has no type declaration\.$/
       then
-        who = $1 == "anonymous" ? "anonymous function" : quote($1)
         <<EOF
-error: #{who} missing type declaration
+error: #{quote($1) + " " unless $1 == "anonymous"}missing return type
+EOF
+      when
+        /^Warning: parameter '(.+)' has no type declaration\.$/
+      then
+        <<EOF
+error: #{quote($1)} missing type
 EOF
       when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/ then <<EOF
 error: package should be #{quote $1}
