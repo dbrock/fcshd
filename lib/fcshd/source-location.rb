@@ -1,3 +1,5 @@
+require "pathname"
+
 module FCSHD
   class SourceLocation < Struct.new(:filename, :line_number)
     def to_s(basedir=nil)
@@ -5,11 +7,7 @@ module FCSHD
     end
 
     def relative_filename(basedir)
-      if basedir
-        filename.sub(/^#{Regexp.quote(basedir)}/, "")
-      else
-        filename
-      end
+      Pathname.new(filename).relative_path_from(Pathname.new(basedir))
     end
   end
 end
