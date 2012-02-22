@@ -159,7 +159,7 @@ error: #{quote $1} unexpected
 EOF
       when /^Syntax error: expecting (.+?) before (.+?)\.$/
         <<EOF
-error: syntax: expected #{lexeme $1}, got #{lexeme $2}
+error: missing #{lexeme $1}
 EOF
       else
         mxmlc_message
