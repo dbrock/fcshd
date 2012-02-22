@@ -141,8 +141,7 @@ for name in ARGV
   end
 end
 
-ENV["FCSHD_LIBRARY_PATH"] ||= ""
-ENV["FCSHD_LIBRARY_PATH"] += ":~/.fcshd-lib"
+ENV["FCSHD_LIBRARY_PATH"] ||= "~/.fcshd-lib"
 
 def find_library(name)
   nil.tap do
