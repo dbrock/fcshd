@@ -132,6 +132,9 @@ EOF
       when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/ then <<EOF
 error: package should be #{quote $1}
 EOF
+      when /^A file found in a source-path '(.*)' must have the same name as the class definition inside the file '(.*)'\.$/ then <<EOF
+error: name should be #{quote $1}
+EOF
       when /^Comparison between a value with static type (.+) and a possibly unrelated type (.+)\.$/ then <<EOF
 error: comparing #$1 to #$2
 EOF
