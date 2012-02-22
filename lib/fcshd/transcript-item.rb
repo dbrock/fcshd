@@ -147,15 +147,16 @@ EOF
       when "Function does not return a value." then <<EOF
 error: missing return statement"
 EOF
-      when "Syntax error: expecting identifier before rightparen." then <<EOF
-error: #{quote ")"} unexpected"
-EOF
       when
         /^The (.+) attribute can only be used inside a package\./,
         /^The (.+) attribute may be used only on class property definitions\./
       then
         <<EOF
 error: #{quote $1} unexpected
+EOF
+      when /^Syntax error: expecting (.+?) before (.+?)\.$/
+        <<EOF
+error: syntax: expected #{lexeme $1}, got #{lexeme $2}
 EOF
       else
         mxmlc_message
@@ -164,5 +165,25 @@ EOF
 
     def quote(string) "‘#{string}’" end
     def name(string) string.sub! ":", "." end
+
+    LEXEMES = Hash[<<EOF.lines.entries.map { |x| x.chomp.split(" ", 2) }]
+colon :
+semicolon ;
+leftparen (
+rightparen )
+leftbracket [
+rightbracket ]
+leftbrace {
+rightbrace }
+identifier term
+EOF
+
+    def lexeme(name)
+      case result = LEXEMES[name]
+      when nil then name
+      when /^.$/ then quote(result)
+      else result
+      end
+    end
   end
 end
