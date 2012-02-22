@@ -159,13 +159,14 @@ error: #{quote $1} unexpected
 EOF
       when /^Syntax error: expecting (.+?) before (.+?)\.$/
         <<EOF
-error: missing #{lexeme $1}
+error: missing #{lexeme($1)} (found #{lexeme($2)} instead)
 EOF
       else
         mxmlc_message
       end
     end
 
+    def doublequote(string) "“#{string}”" end
     def quote(string) "‘#{string}’" end
     def name(string) string.sub! ":", "." end
 
@@ -183,7 +184,7 @@ EOF
 
     def lexeme(name)
       case result = LEXEMES[name]
-      when nil then name
+      when nil then doublequote(name)
       when /^.$/ then quote(result)
       else result
       end
