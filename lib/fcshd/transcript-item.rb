@@ -54,6 +54,9 @@ EOF
       when /^Incorrect number of arguments. Expected (\d+)\.$/ then <<EOF
 error: expected #$1 arguments
 EOF
+      when /^Incorrect number of arguments. Expected no more than (\d+)\.$/ then <<EOF
+error: expected at most #$1 arguments
+EOF
       when
         /^Access of possibly undefined property (.+) through a reference with static type (.+)\.$/,
         /^Call to a possibly undefined method (.+) through a reference with static type (.+)\.$/,
@@ -161,33 +164,34 @@ EOF
         <<EOF
 error: missing #{lexeme($1)} (found #{lexeme($2)} instead)
 EOF
+
+      when "Syntax error: XML does not have matching begin and end tags."
+        <<EOF
+error: XML tag mismatch
+EOF
       else
         mxmlc_message
       end
     end
 
-    def doublequote(string) "“#{string}”" end
+    def name(string) string.sub!(":", ".") end
     def quote(string) "‘#{string}’" end
-    def name(string) string.sub! ":", "." end
-
-    LEXEMES = Hash[<<EOF.lines.entries.map { |x| x.chomp.split(" ", 2) }]
-colon :
-semicolon ;
-leftparen (
-rightparen )
-leftbracket [
-rightbracket ]
-leftbrace {
-rightbrace }
-identifier term
-EOF
 
     def lexeme(name)
-      case result = LEXEMES[name]
-      when nil then doublequote(name)
-      when /^.$/ then quote(result)
-      else result
-      end
+      parse_line = lambda { |line| line.chomp.split(/\s*\|\s*/, 2) }
+      Hash[<<EOF.lines.map(&parse_line)][name] || quote(name)
+colon          | ‘:’
+semicolon      | ‘;’
+leftparen      | ‘(’
+rightparen     | ‘)’
+leftbracket    | ‘[’
+rightbracket   | ‘]’
+leftbrace      | ‘{’
+rightbrace     | ‘}’
+xmltagstartend | ‘</>’
+identifier     | expression
+end of program | eof
+EOF
     end
   end
 end
