@@ -24,10 +24,12 @@ module FCSHD
 
         when /^(\/.+?)(?:\((\d+)\))?: (?:col: \d+ )?(.+)$/
           result << Transcript::Item[SourceLocation[$1, $2.to_i], $3]
-          skip_indented_lines! # Ignore the "diagram" of the problem.
+          skip_problem_diagram!
+          skip_indented_lines!
 
         when /^Required RSLs:$/
-          skip_indented_lines! # Does anybody care about this?
+          # Does anybody care about this?
+          skip_indented_lines!
 
         when /^(Recompile|Reason|Updated): /
         when /^Loading configuration file /
@@ -57,6 +59,10 @@ module FCSHD
 
     def current_line
       lines.first.chomp
+    end
+
+    def skip_problem_diagram!
+      lines.shift(4) if lines[0...4].grep /^\s*\^\s*$/
     end
 
     def skip_indented_lines!
