@@ -62,7 +62,7 @@ module FCSHD
     end
 
     def skip_problem_diagram!
-      lines.shift(4) if lines[0...4].grep /^\s*\^\s*$/
+      lines.shift(4) unless lines[0...4].grep(/^\s*\^\s*$/).empty?
     end
 
     def skip_indented_lines!
