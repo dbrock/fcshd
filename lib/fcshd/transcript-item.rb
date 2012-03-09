@@ -4,7 +4,7 @@ module FCSHD
   class Transcript; end
   class Transcript::Item < Struct.new(:location, :mxmlc_message)
     def to_s(basedir)
-      problems.map { |problem| problem.to_s(basedir) }.join("\n")
+      problems.map { |problem| problem.to_s(basedir) + "\n" }
     end
 
     def problems
@@ -120,16 +120,11 @@ EOF
       when /^A conflict exists with definition (.+) in namespace internal\.$/ then <<EOF
 error: #{quote $1} conflicts with an internal name
 EOF
-      when
-        /^Warning: return value for function '(.+)' has no type declaration\.$/
-      then
+      when /^Warning: return value for function '(.+)' has no type declaration\.$/ then
         <<EOF
 error: #{quote($1) + " " unless $1 == "anonymous"}missing return type
 EOF
-      when
-        /^Warning: parameter '(.+)' has no type declaration\.$/
-      then
-        <<EOF
+      when /^Warning: parameter '(.+)' has no type declaration\.$/ then <<EOF
 error: #{quote($1)} missing type
 EOF
       when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/ then <<EOF

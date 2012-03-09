@@ -21,9 +21,9 @@ module FCSHD
       @items.map do |item|
         case item
         when Item
-          "#{item.to_s(basedir)}\n"
+          item.to_s(basedir)
         else
-          "#{item}\n"
+          item
         end
       end.join
     end
