@@ -64,7 +64,7 @@ module FCSHD
     rescue FCSHError => error
       case error.message
       when "Error: null"
-        @frontend.puts "fcshd: Adobe-internal error; restarting fcsh..."
+        @frontend.puts "fcshd: got mysterious error; restarting fcsh..."
         restart_fcsh_process!
         @frontend.puts "fcshd: retrying your compilation"
         compile_new!
