@@ -28,21 +28,16 @@ module FCSHD
           skip_indented_lines!
 
         when /^Required RSLs:$/
-          # Does anybody care about this?
           skip_indented_lines!
 
         when /^(Recompile|Reason|Updated): /
         when /^Loading configuration file /
         when "Detected configuration changes. Recompile..."
 
+        when /^fcshd: /
+          result << line
         else
-          # Let unrecognized lines pass through verbatim.
-          if line.start_with? "fcshd: "
-            result << line
-          else
-            # XXX: What about when we support compc?
-            result << "mxmlc: #{line}"
-          end
+          result << "mxmlc: #{line}" # XXX: Could be `compc` too.
         end
       end
     end
