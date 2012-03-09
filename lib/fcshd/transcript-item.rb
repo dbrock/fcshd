@@ -127,6 +127,10 @@ EOF
       when /^Warning: parameter '(.+)' has no type declaration\.$/ then <<EOF
 error: #{quote($1)} missing type
 EOF
+
+       when "Warning: This compilation unit did not have a factoryClass specified in Frame metadata to load the configured runtime shared libraries. To compile without runtime shared libraries either set the -static-link-runtime-shared-libraries option to true or remove the -runtime-shared-libraries option."
+       then []
+
       when /^A file found in a source-path must have the same package structure '(.*)', as the definition's package, '(.*)'\.$/ then <<EOF
 error: package should be #{quote $1}
 EOF
