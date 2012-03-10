@@ -57,6 +57,17 @@ EOF
       when /^Incorrect number of arguments. Expected no more than (\d+)\.$/ then <<EOF
 error: expected at most #$1 arguments
 EOF
+
+      when /^Interface method (.+) in namespace (.+) not implemented by class (.+)\.$/ then <<EOF
+error: #{quote $1} (from #{name $2}) not implemented
+EOF
+      when /^Interface method (.+) in namespace (.+) not implemented by class (.+)\.$/ then <<EOF
+error: #{quote $1} (from #{name $2}) not implemented
+EOF
+      when /^Interface method (.+) in namespace (.+) is implemented with an incompatible signature in class (.+)\.$/ then <<EOF
+error: #{quote $1} (from #{name $2}) implemented incorrectly
+EOF
+
       when
         /^Access of possibly undefined property (.+) through a reference with static type (.+)\.$/,
         /^Call to a possibly undefined method (.+) through a reference with static type (.+)\.$/,
@@ -64,7 +75,7 @@ EOF
       then <<EOF
 error: #{quote $1} undeclared in #{name $2}
 EOF
-      when /^Attempted access of inaccessible property (.+) through a reference with static type (.+)\.$/ then <<EOF
+      when /^Attempted access of inaccessible (?:property|method) (.+) through a reference with static type (.+)\.$/ then <<EOF
 error: #{quote $1} inaccessible in #{name $2}
 EOF
       when
@@ -146,8 +157,14 @@ EOF
       when "Function does not have a body." then <<EOF
 error: missing function body"
 EOF
+      when "Return value must be undefined." then <<EOF
+error: cannot return something here
+EOF
+      when "Return type of a getter definition must not be void." then <<EOF
+error: must return something
+EOF
       when "Return type of a setter definition must be unspecified or void." then <<EOF
-error: setter must return void"
+error: setter must not return anything"
 EOF
       when "Function does not return a value." then <<EOF
 error: missing return statement"
