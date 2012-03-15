@@ -257,4 +257,7 @@ end
 transcript = FCSHD::Transcript[compiler_output]
 basedir = File.join(File.expand_path("."), "")
 STDOUT.write transcript.to_s(basedir)
-exit 1 if not transcript.succeeded?
+
+if $run_compilation || $dry_run
+  exit 1 if not transcript.succeeded?
+end
