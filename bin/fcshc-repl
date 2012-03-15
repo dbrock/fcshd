@@ -33,18 +33,12 @@ end
 
 program_template = <<EOF
 package {
-  import stdio.flash.Sprite
-  import stdio.process
-  import stdlib.inspect
-  import flash.utils.*
+  import stdio.Sprite
 
   public class dummy extends Sprite {
-    override public function main(): void {
-      process.immortal = false
-      process.whiny = true
-
+    public function main(): void {
       try {
-        process.warn(inspect(__CODE__))
+        process.warn(__CODE__)
       } finally {
         process.exit()
       }
@@ -61,9 +55,9 @@ class MyInterrupt < StandardError; end
 
 while line = Readline.readline("as3> ", true)
   File.open("dummy.as", "w") { |file| file << get_program[line] }
-  output = `fcshc -lstdlib -lstdio -lknock --no-rsls dummy.as`
+  output = `fcshc -lknock --no-rsls dummy.as`
   puts output.gsub(/^dummy.as:\d+: /, "") unless output == ""
   if $? == 0
-    system "run-stdio-swf dummy.swf"
+    system "run-swf dummy.swf"
   end
 end
