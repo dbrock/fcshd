@@ -35,6 +35,7 @@ program_template = <<EOF
 package {
   import stdio.Sprite
 
+  [SWF(width=0, height=0)]
   public class dummy extends Sprite {
     public function main(): void {
       try {
@@ -51,13 +52,11 @@ get_program = lambda do |code|
   program_template.sub("__CODE__", code)
 end
 
-class MyInterrupt < StandardError; end
-
 while line = Readline.readline("as3> ", true)
   File.open("dummy.as", "w") { |file| file << get_program[line] }
-  output = `fcshc -lknock --no-rsls dummy.as`
+  output = `fcshc -lstdio --no-rsls dummy.as`
   puts output.gsub(/^dummy.as:\d+: /, "") unless output == ""
-  if $? == 0
-    system "run-swf dummy.swf"
-  end
+  system "run-swf dummy.swf" if $? == 0
 end
+
+puts
