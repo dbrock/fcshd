@@ -22,16 +22,16 @@ EOF
 logger.log "fcshd #{FCSHD::VERSION}"
 
 compiler = FCSHD::Compiler.new(logger)
-compiler.start! 
+compiler.start!
 
 Thread.abort_on_exception = true
 
 begin
+  logger.log "listening to port #{FCSHD::Server::PORT}..."
   FCSHD::Server.new(FCSHD::Server::PORT, compiler, logger).run!
-  logger.log "Now listening to port #{FCSHD_PORT}."
 rescue Interrupt
   logger.log ""
-  logger.log "Exiting."
+  logger.log "exiting"
 rescue Exception => error
-  logger.error "Could not listen to port #{FCSHD_PORT}: #{error}"
+  logger.error "could not listen to port #{FCSHD::Server::PORT}: #{error}"
 end
