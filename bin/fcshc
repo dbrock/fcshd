@@ -124,10 +124,11 @@ EOF
   parser.separator "TL;DR: $ fcshc src/my_app.mxml"
 end.parse!
 
-$run_compilation = true unless $run_compilation == false
 $extra_arguments << "-debug" unless $production
 
 for name in ARGV
+  $run_compilation = true
+
   if not File.exists? name
     die "no such file or directory: #{name}"
   elsif File.directory? name
@@ -231,33 +232,47 @@ if $run_compilation
   $compilation_command.concat($extra_arguments)
 end
 
-warn $compilation_command.join(" ") if $verbose
-exit if $dry_run
-
-begin
-  host, port = "localhost", FCSHD::Server::PORT
-  socket = TCPSocket.new(host, port)
-rescue Errno::ECONNREFUSED
-  die "could not connect to fcshd at #{host}:#{port}"
-end
-
-socket.puts "restart" if $restart_compiler
-socket.puts $compilation_command.join(" ") if $run_compilation
-
-compiler_output = ""
-socket.each_line do |line|
-  case line
-  when /^fcshd: /
-    warn line.chomp
-  else
-    compiler_output << line
+def run_command(command)
+  begin
+    host, port = "localhost", FCSHD::Server::PORT
+    socket = TCPSocket.new(host, port)
+  rescue Errno::ECONNREFUSED
+    die "could not connect to fcshd at #{host}:#{port}"
   end
+
+  socket.puts command
+
+  compiler_output = ""
+  socket.each_line do |line|
+    case line
+    when /^fcshd: /
+      warn line.chomp
+    else
+      compiler_output << line
+    end
+  end
+
+  if $verbose
+    STDOUT.write compiler_output
+  end
+
+  compiler_output
 end
 
-transcript = FCSHD::Transcript[compiler_output]
-basedir = File.join(File.expand_path("."), "")
-STDOUT.write transcript.to_s(basedir)
+run_command "restart" if $restart_compiler
 
-if $run_compilation || $dry_run
-  exit 1 if not transcript.succeeded?
+if $run_compilation
+  command = $compilation_command.join(" ")
+
+  if $dry_run
+    warn command if $verbose
+  else
+    compiler_output = run_command command
+    transcript = FCSHD::Transcript[compiler_output]
+
+    basedir = File.join(File.expand_path("."), "")
+    STDOUT.write transcript.to_s(basedir)
+
+    exit 1 if not transcript.succeeded?
+  end
 end
