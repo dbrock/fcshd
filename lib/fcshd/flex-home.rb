@@ -5,7 +5,7 @@ module FCSHD
     extend self
 
     def default
-      "/Library/Flex"
+      "/usr/local/flex"
     end
 
     def known?
