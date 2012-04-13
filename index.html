@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
+    <title>fcshd by dbrock</title>
+  </head>
+
+  <body>
+    <a id="forkme_banner" href="https://github.com/dbrock/fcshd">Fork Me on GitHub</a>
+    <div class="shell">
+
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>fcshd</h1>
+            <h2>Usable CLI frontend to Adobe’s Flex compiler</h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
+
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/dbrock/fcshd/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/dbrock/fcshd/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
+
+      <span class="banner-fix"></span>
+
+      <section id="main_content">
+        <p>This package aims to remove pain points for Adobe Flex developers who
+prefer to compile code from the terminal or their favorite editor:</p>
+
+<ul>
+<li><p>It speeds up compilation by leveraging Adobe’s own Flex Compiler
+Shell (<code>fcsh</code>) and a client-server architecture: basically, you
+start the <code>fcshd</code> server, and then use the client program <code>fcshc</code>
+as a faster and more usable replacement for <code>mxmlc</code>.</p></li>
+<li><p>It abstracts away the crazy command-line interface of <code>mxmlc</code> and
+gives you a simpler and more <code>gcc</code>-like interface to work with.</p></li>
+<li><p>It post-processes all compiler output, simplifies most of the
+verbose (sometimes bordering on rambling) error messages, and
+converts the stack traces into a more conventional GNU-style
+format (so that tools like Emacs can understand them).</p></li>
+<li><p>It provides a rudimentary library lookup mechanism which lets you
+reference any source directory or SWC you link into <code>~/.fcshd-lib</code>
+(or <code>$FCSHD_LIBRARY_PATH</code>, if set) through the <code>-l</code> option.</p></li>
+</ul><p>It makes the easy easy:</p>
+
+<pre><code>$ fcshc src/foo.mxml -o foo.swf
+</code></pre>
+
+<p>And the hard possible:</p>
+
+<pre><code>$ fcshc --help
+Usage: fcshc MAIN.{as,mxml} [SRCDIR|SWCDIR|SWC]... [-o OUT.swf]
+       fcshc SRCDIR... [SWCDIR|SWC]... -o OUT.swc
+</code></pre>
+
+<p>To compile an SWF, name the main application source file, then any
+additional source directories, SWC directories, or SWC files.</p>
+
+<p>To compile an SWC using <code>compc</code>, you must provide the <code>-o</code> option, and
+then at least one source directory, SWC directory, or SWC file.</p>
+
+<p>Dependencies can also be specified by name using the <code>-l LIB</code> option,
+which will search for LIB or LIB.swc in <code>~/.fcshd-lib</code>.  Both source
+directories, SWC directories, and SWC files can be named in this way.</p>
+
+<p>To pass extra arguments, use e.g. <code>-X -include-file -X NAME -X FILE</code>.</p>
+
+<pre><code>    -o, --output OUTPUT.{swf,swc}    Name of the resulting binary
+    -l, --library LIBRARY            Search LIBRARY when compiling
+
+    -p, --production                 Leave out debugging metadata
+        --no-rsls                    Do not use Flex RSLs
+        --static-rsls                Use static linking for RSLs
+
+    -3, --flex-3                     Use -compatibility-version=3
+        --halo                       Use the Halo theme
+
+    -X EXTRA-ARGUMENT                Pass through EXTRA-ARGUMENT
+
+    -R, --restart                    Restart the compiler first
+    -n, --dry-run                    Only print the compiler command
+        --verbose                    Also print the compiler command
+
+    -v, --version                    Show fcshd version
+    -h, --help                       Show this message
+</code></pre>
+      </section>
+
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/dbrock">dbrock</a> can be found on <a href="https://github.com/dbrock/fcshd">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
+    </div>
+
+    
+  </body>
+</html>
