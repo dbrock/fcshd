@@ -67,14 +67,14 @@ EOF
     $production = true
   end
 
-  parser.on("--static-rsls", "Use static linking for RSLs") do
-    $run_compilation = true
-    $extra_arguments << "-static-link-runtime-shared-libraries=true"
-  end
-
   parser.on("--no-rsls", "Remove all runtime shared libraries") do
     $run_compilation = true
     $extra_arguments << "-runtime-shared-library-path="
+  end
+
+  parser.on("--static-rsls", "Use static linking for RSLs") do
+    $run_compilation = true
+    $extra_arguments << "-static-link-runtime-shared-libraries=true"
   end
 
   parser.separator ""
