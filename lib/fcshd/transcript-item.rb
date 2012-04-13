@@ -45,11 +45,7 @@ module FCSHD
     def parsed_message
       case FCSHD.trim(mxmlc_message).sub(/^Error: /, "")
       when "Unable to resolve MXML language version. Please specify the language namespace on the root document tag." then <<EOF
-error: missing MXML version
-error: hint: xmlns:fx="library://ns.adobe.com/mxml/2009"
-error: hint: xmlns="library://ns.adobe.com/flex/spark"
-error: hint: xmlns:mx="library://ns.adobe.com/flex/mx" (Flex 4)
-error: hint: xmlns="http://www.adobe.com/2006/mxml" (Flex 3)
+error: missing xmlns:fx="http://ns.adobe.com/mxml/2009"
 EOF
       when /^Incorrect number of arguments. Expected (\d+)\.$/ then <<EOF
 error: expected #$1 arguments
