@@ -9,7 +9,7 @@ prefer to compile code from the terminal or their favorite editor:
   * It abstracts away the crazy command-line interface of `mxmlc` and
     gives you a simpler and more `gcc`-like interface to work with.
 
-  * It postprocesses all compiler output, simplifies most of the
+  * It post-processes all compiler output, simplifies most of the
     verbose (sometimes bordering on rambling) error messages, and
     converts the stack traces into a more conventional GNU-style
     format (so that tools like Emacs can understand them).
@@ -18,11 +18,10 @@ prefer to compile code from the terminal or their favorite editor:
     reference any source directory or SWC you link into `~/.fcshd-lib`
     (or `$FCSHD_LIBRARY_PATH`, if set) through the `-l` option.
 
-
 It makes the easy easy:
 
 ```
-$ fcshc src/foo.mxml
+$ fcshc src/foo.mxml -o foo.swf
 ```
 
 And the hard possible:
@@ -46,7 +45,7 @@ directories, SWC directories, and SWC files can be named in this way.
 To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE`.
 
 ```
-    -o, --output OUTPUT.[swf|swc]    Name of the resulting binary
+    -o, --output OUTPUT.{swf,swc}    Name of the resulting binary
     -l, --library LIBRARY            Search LIBRARY when compiling
 
     -p, --production                 Leave out debugging metadata

@@ -30,20 +30,20 @@ $dry_run = false
 
 OptionParser.new do |parser|
   parser.banner = <<EOF
-Usage: fcshc MAIN.[as|mxml] [-l LIB] [SRCDIR|SWCDIR|SWC]... [-o OUT.swf]
-       fcshc -o OUT.swc SRCDIR... [-l LIB]... [SWCDIR|SWC]...
+Usage: fcshc MAIN.{as,mxml} [SRCDIR|SWCDIR|SWC]... [-o OUT.swf]
+       fcshc SRCDIR... [SWCDIR|SWC]... -o OUT.swc
 
 To compile an SWF, name the main application source file, then any
 additional source directories, SWC directories, or SWC files.
 
-To compile an SWC using `compc', you must provide the `-o' option, and
+To compile an SWC using `compc`, you must provide the `-o` option, and
 then at least one source directory, SWC directory, or SWC file.
 
-Dependencies can also be specified by name using the `-l LIB' option,
-which will search for LIB or LIB.swc in `~/.fcshd-lib'.  Both source
+Dependencies can also be specified by name using the `-l LIB` option,
+which will search for LIB or LIB.swc in `~/.fcshd-lib`.  Both source
 directories, SWC directories, and SWC files can be named in this way.
 
-To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE'.
+To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE`.
 
 EOF
 
@@ -57,10 +57,7 @@ EOF
     $libraries << value
   end
 
-  parser.on("-X", "--extra-argument ARGUMENT", "Pass ARGUMENT to the compiler") do |value|
-    $run_compilation = true
-    $extra_arguments << value
-  end
+  parser.separator ""
 
   parser.on("-p", "--production", "Leave out debugging metadata") do
     $run_compilation = true
@@ -95,6 +92,13 @@ EOF
 
   parser.separator ""
 
+  parser.on("-X", "--extra-argument ARGUMENT", "Pass ARGUMENT to the compiler") do |value|
+    $run_compilation = true
+    $extra_arguments << value
+  end
+
+  parser.separator ""
+
   parser.on("-R", "--restart", "Restart the compiler first") do
     $run_compilation = false if $run_compilation == nil
     $restart_compiler = true
@@ -110,7 +114,9 @@ EOF
     $verbose = true
   end
 
-  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}'") do
+  parser.separator ""
+
+  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}`") do
     puts "fcshc #{FCSHD::VERSION}"
     exit
   end
@@ -121,7 +127,7 @@ EOF
   end
 
   parser.separator ""
-  parser.separator "TL;DR: $ fcshc src/my_app.mxml"
+  parser.separator "Report bugs to <https://github.com/dbrock/fcshd>."
 end.parse!
 
 $extra_arguments << "-debug" unless $production
