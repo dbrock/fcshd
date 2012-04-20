@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 module FCSHD
   class Compiler
+    attr_reader :sdk_version
+
     def initialize(logger)
       @logger = logger
       @output_buffer = ""
@@ -37,6 +39,12 @@ module FCSHD
       @logger.log "starting #{FlexHome.fcsh}"
       @fcsh_process = IO.popen("#{FlexHome.fcsh} 2>&1", "r+")
       read_until_prompt!
+      case @output
+      when /^Version (\S+)/
+        @sdk_version = $1
+      else
+        @logger.die "could not find Flex SDK version"
+      end
     end
 
     def stop_fcsh_process!

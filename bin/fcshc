@@ -28,6 +28,33 @@ $restart_compiler = false
 $run_compilation = nil
 $dry_run = false
 
+def run_command(command)
+  begin
+    host, port = "localhost", FCSHD::Server::PORT
+    socket = TCPSocket.new(host, port)
+  rescue Errno::ECONNREFUSED
+    die "could not connect to fcshd at #{host}:#{port}"
+  end
+
+  socket.puts command
+
+  compiler_output = ""
+  socket.each_line do |line|
+    case line
+    when /^fcshd: /
+      warn line.chomp
+    else
+      compiler_output << line
+    end
+  end
+
+  if $verbose
+    STDOUT.write compiler_output
+  end
+
+  compiler_output
+end
+
 OptionParser.new do |parser|
   parser.banner = <<EOF
 Usage: fcshc MAIN.{as,mxml} [SRCDIR|SWCDIR|SWC]... [-o OUT.swf]
@@ -116,8 +143,13 @@ EOF
 
   parser.separator ""
 
-  parser.on("-v", "--version", "Show `fcshc #{FCSHD::VERSION}`") do
+  parser.on("-v", "--version", "Show the fcshd version`") do
     puts "fcshc #{FCSHD::VERSION}"
+    exit
+  end
+
+  parser.on("--sdk-version", "Show the Flex SDK version") do
+    puts run_command("sdk-version") 
     exit
   end
 
@@ -236,33 +268,6 @@ if $run_compilation
   end
 
   $compilation_command.concat($extra_arguments)
-end
-
-def run_command(command)
-  begin
-    host, port = "localhost", FCSHD::Server::PORT
-    socket = TCPSocket.new(host, port)
-  rescue Errno::ECONNREFUSED
-    die "could not connect to fcshd at #{host}:#{port}"
-  end
-
-  socket.puts command
-
-  compiler_output = ""
-  socket.each_line do |line|
-    case line
-    when /^fcshd: /
-      warn line.chomp
-    else
-      compiler_output << line
-    end
-  end
-
-  if $verbose
-    STDOUT.write compiler_output
-  end
-
-  compiler_output
 end
 
 run_command "restart" if $restart_compiler

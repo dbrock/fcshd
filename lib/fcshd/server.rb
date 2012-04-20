@@ -26,6 +26,8 @@ module FCSHD
         when "restart"
           compiler.restart!
           socket.puts "fcshd: compiler restarted"
+        when "sdk-version"
+          socket.puts compiler.sdk_version
         else
           socket.puts "fcshd: unrecognized command: #{command}"
         end
