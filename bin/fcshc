@@ -9,6 +9,7 @@ rescue LoadError
 end
 
 require "optparse"
+require "shellwords"
 require "socket"
 
 def die(message)
@@ -70,7 +71,8 @@ Dependencies can also be specified by name using the `-l LIB` option,
 which will search for LIB or LIB.swc in `~/.fcshd-lib`.  Both source
 directories, SWC directories, and SWC files can be named in this way.
 
-To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE`.
+To pass extra arguments, use e.g. `-X -include-file -X NAME -X FILE`
+or `--extra-arguments='-include-file NAME FILE'`.
 
 EOF
 
@@ -122,6 +124,11 @@ EOF
   parser.on("-X", "--extra-argument ARGUMENT", "Pass ARGUMENT to the compiler") do |value|
     $run_compilation = true
     $extra_arguments << value
+  end
+
+  parser.on("--extra-arguments ARGUMENTS", "Pass ARGUMENTS to the compiler") do |value|
+    $run_compilation = true
+    $extra_arguments.concat(value.shellsplit)
   end
 
   parser.separator ""
