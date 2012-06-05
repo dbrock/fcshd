@@ -9,11 +9,11 @@ sources = FileList["{bin,lib}/**/*"]
 task :default => [:uninstall, :install]
 
 task :install => gem do
-  sh "sudo gem install #{gem}"
+  sh "gem install #{gem}"
 end
 
 task :uninstall do
-  sh "sudo gem uninstall -ax #{name}"
+  sh "gem uninstall -ax #{name}"
 end
 
 file gem => FileList[gemspec, sources] do
@@ -22,7 +22,7 @@ end
 
 task :push => gem do
   sh "gem push #{gem}"
-  sh "sudo gem install #{name}"
+  sh "gem install #{name}"
 end
 
 require "rake/clean"
