@@ -13,7 +13,7 @@ task :install => gem do
 end
 
 task :uninstall do
-  sh "sudo gem uninstall #{name} --executables -v #{version}"
+  sh "sudo gem uninstall -ax #{name}"
 end
 
 file gem => FileList[gemspec, sources] do
