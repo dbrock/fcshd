@@ -57,9 +57,6 @@ EOF
       when /^Interface method (.+) in namespace (.+) not implemented by class (.+)\.$/ then <<EOF
 error: #{quote $1} (from #{name $2}) not implemented
 EOF
-      when /^Interface method (.+) in namespace (.+) not implemented by class (.+)\.$/ then <<EOF
-error: #{quote $1} (from #{name $2}) not implemented
-EOF
       when /^Interface method (.+) in namespace (.+) is implemented with an incompatible signature in class (.+)\.$/ then <<EOF
 error: #{quote $1} (from #{name $2}) implemented incorrectly
 EOF
